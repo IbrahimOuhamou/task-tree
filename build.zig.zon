@@ -1,0 +1,28 @@
+//بسم الله الرحمن الرحيم
+//la ilaha illa Allah Mohammed Rassoul Allah
+.{
+    .name = "task-tree",
+    .version = "0.0.1",
+
+    .minimum_zig_version = "0.12.0",
+
+    .dependencies = .{
+        .task_tree_lib = .{
+            .url = "https://github.com/IbrahimOuhamou/task_tree_lib/archive/refs/tags/v1.1.tar.gz",
+            .hash = "122096af08417837773d50d86f3fd72acb3db6ac004798ec44ff55bc7076a78864b5",
+        },
+        .@"raylib-zig" = .{
+            .url = "https://github.com/IbrahimOuhamou/raylib-zig/archive/b94d42f27f380517eb337474bcc4e3cc6b125934.tar.gz",
+            .hash = "122002056dc85b107e18b4224d8436fc9b5b4b01e93e269db54041bdf47554aa93ef",
+        },
+    },
+
+    .paths = .{
+        "",
+        //"build.zig",
+        //"build.zig.zon",
+        //"src",
+        //"LICENSE",
+        //"README.md",
+    },
+}
