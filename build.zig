@@ -37,8 +37,8 @@ pub fn build(b: *std.Build) void {
     exe.linkLibrary(raylib_artifact);
     exe.linkLibC();
 
-    const task_tree_lib_dep = b.dependency("task_tree_lib", .{ .optimize = optimize, .target = target });
-    exe.root_module.addImport("task_tree_lib", task_tree_lib_dep.module("task_tree_lib"));
+    const libtask_tree = b.dependency("libtask-tree", .{ .optimize = optimize, .target = target });
+    exe.root_module.addImport("libtask-tree", libtask_tree.module("libtask-tree"));
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default

@@ -7,9 +7,9 @@
     .minimum_zig_version = "0.12.0",
 
     .dependencies = .{
-        .task_tree_lib = .{
-            .url = "https://github.com/IbrahimOuhamou/task_tree_lib/archive/refs/tags/v1.1.tar.gz",
-            .hash = "122096af08417837773d50d86f3fd72acb3db6ac004798ec44ff55bc7076a78864b5",
+        .@"libtask-tree" = .{
+            .url = "https://github.com/IbrahimOuhamou/libtask-tree/archive/c0edb4f493ea589f4f2359244bb453eb07920ad6.tar.gz",
+            .hash = "122028774fa813a377c032e69d93f93743fc59b7542113bf80d3d4839ae609692475",
         },
         .@"raylib-zig" = .{
             .url = "https://github.com/IbrahimOuhamou/raylib-zig/archive/b94d42f27f380517eb337474bcc4e3cc6b125934.tar.gz",
