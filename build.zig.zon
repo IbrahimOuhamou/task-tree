@@ -8,8 +8,8 @@
 
     .dependencies = .{
         .@"libtask-tree" = .{
-            .url = "https://github.com/IbrahimOuhamou/libtask-tree/archive/c0edb4f493ea589f4f2359244bb453eb07920ad6.tar.gz",
-            .hash = "122028774fa813a377c032e69d93f93743fc59b7542113bf80d3d4839ae609692475",
+            .url = "https://github.com/IbrahimOuhamou/libtask-tree/archive/60688b103623216ee9761359917f1e743cd27082.tar.gz",
+            .hash = "1220396c510895e7aa38624d980a8a2f0095ca45451d8a1cfac4a3b990c7c2e43733",
         },
         .@"raylib-zig" = .{
             .url = "https://github.com/IbrahimOuhamou/raylib-zig/archive/b94d42f27f380517eb337474bcc4e3cc6b125934.tar.gz",
