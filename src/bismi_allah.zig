@@ -15,10 +15,11 @@ pub fn main() !void {
 
     const tlist = try tt.Tlist.new(allocator);
 
-    rl.initWindow(800, 500, "بسم الله الرحمن الرحيم");
-
+    rl.initWindow(1200, 600, "بسم الله الرحمن الرحيم");
     defer rl.closeWindow();
+
     rl.setTargetFPS(60);
+    rl.setWindowState(rl.ConfigFlags.flag_window_resizable);
 
     const ControlPanel = struct {
         buffer: [34:0]u8 = [34:0]u8{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -26,7 +27,7 @@ pub fn main() !void {
     };
 
     var control_panel = ControlPanel{
-        .rec = rl.Rectangle{ .x = 20, .y = 20, .width = 100, .height = 150 },
+        .rec = rl.Rectangle{ .x = 20, .y = 20, .width = 100, .height = 40 },
     };
     control_panel.buffer[0] = 0;
     control_panel.buffer[control_panel.buffer.len - 1] = 0;
@@ -50,6 +51,9 @@ pub fn main() !void {
     while (!rl.windowShouldClose()) {
         const delta = rl.getMouseDelta();
 
+        // -------------------------------------------------------------------------------------------------------------------------------------
+        //                                                      handlr state
+        // -------------------------------------------------------------------------------------------------------------------------------------
         // state with the help of Allah
         // if a task is clicked it becomes TaskKSelect|TaskMove
         state_machine = handle_state: {
@@ -159,7 +163,9 @@ pub fn main() !void {
         defer rl.endDrawing();
         rl.clearBackground(rl.Color.gray);
 
-        // draw tasks
+        // -------------------------------------------------------------------------------------------------------------------------------------
+        //                                                      draw tasks
+        // -------------------------------------------------------------------------------------------------------------------------------------
         if (null != tlist.data) {
             for (tlist.data.?) |task| {
                 if (null == task) continue;
@@ -168,7 +174,7 @@ pub fn main() !void {
 
                 if (null != task.?.children_ids) {
                     for (task.?.children_ids.?) |child_id| {
-                        rl.drawLineBezier(rl.Vector2{ .x = task.?.x + (TASK_WIDTH / 2), .y = task.?.y + TASK_HEIGHT }, rl.Vector2{ .x = tlist.data.?[child_id].?.x + (TASK_WIDTH / 2), .y = tlist.data.?[child_id].?.y }, 7, rl.Color.beige);
+                        rl.drawLineBezier(rl.Vector2{ .x = task.?.x + (TASK_WIDTH / 2), .y = task.?.y + TASK_HEIGHT }, rl.Vector2{ .x = tlist.data.?[child_id].?.x + (TASK_WIDTH / 2), .y = tlist.data.?[child_id].?.y }, 7, rl.Color.orange);
                     }
                 }
 
@@ -184,9 +190,11 @@ pub fn main() !void {
             .TlistMenu => {
                 rl.drawRectangleRec(control_panel.rec, rl.Color.brown);
                 _ = rgui.GuiTextBox(.{ .x = control_panel.rec.x + 1, .y = control_panel.rec.y + 5, .width = control_panel.rec.width - 2, .height = 15 }, &control_panel.buffer, 34, true);
-                if (0 != rgui.GuiButton(.{ .x = control_panel.rec.x + 1, .y = control_panel.rec.y + 20, .width = control_panel.rec.width - 2, .height = 15 }, "new task")) {
+                if (0 != control_panel.buffer[0] and 0 != rgui.GuiButton(.{ .x = control_panel.rec.x + 1, .y = control_panel.rec.y + 20, .width = control_panel.rec.width - 2, .height = 15 }, "new task")) {
                     const task = try tt.Task.new(allocator);
                     task.setName(&control_panel.buffer);
+                    task.x = control_panel.rec.x;
+                    task.y = control_panel.rec.y;
                     try tlist.addTask(task);
                     control_panel.buffer[0] = 0;
                 }
@@ -203,10 +211,10 @@ pub fn main() !void {
                 rl.drawCircleV(vec, 15, rl.Color.blue);
             },
             .TaskConnectChild => {
-                rl.drawLineBezier(rl.Vector2{ .x = tlist.data.?[selected_task].?.x + (TASK_WIDTH / 2), .y = tlist.data.?[selected_task].?.y + TASK_HEIGHT }, rl.getMousePosition(), 7, rl.Color.beige);
+                rl.drawLineBezier(rl.Vector2{ .x = tlist.data.?[selected_task].?.x + (TASK_WIDTH / 2), .y = tlist.data.?[selected_task].?.y + TASK_HEIGHT }, rl.getMousePosition(), 7, rl.Color.orange);
             },
             .TaskConnectParent => {
-                rl.drawLineBezier(rl.Vector2{ .x = tlist.data.?[selected_task].?.x + (TASK_WIDTH / 2), .y = tlist.data.?[selected_task].?.y }, rl.getMousePosition(), 7, rl.Color.beige);
+                rl.drawLineBezier(rl.Vector2{ .x = tlist.data.?[selected_task].?.x + (TASK_WIDTH / 2), .y = tlist.data.?[selected_task].?.y }, rl.getMousePosition(), 7, rl.Color.orange);
             },
             .TaskConnectNext => {
                 rl.drawLineBezier(rl.Vector2{ .x = tlist.data.?[selected_task].?.x + TASK_WIDTH, .y = tlist.data.?[selected_task].?.y + (TASK_HEIGHT / 3) }, rl.getMousePosition(), 7, rl.Color.beige);
