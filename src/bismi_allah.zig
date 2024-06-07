@@ -15,6 +15,18 @@ pub fn main() !void {
 
     const tlist = try tt.Tlist.new(allocator);
 
+    read_from_save_file: {
+        const file = std.fs.cwd().openFile("bismi_allah.ltt", .{}) catch |e| switch (e) {
+            std.fs.Dir.OpenError.FileNotFound => break :read_from_save_file,
+            else => return e,
+        };
+        tlist.readFromStream(file, true) catch |e| switch (e) {
+            tt.Tlist.Error.DataIsNull => {},
+            else => return e,
+        };
+        file.close();
+    }
+
     rl.initWindow(1200, 600, "بسم الله الرحمن الرحيم");
     defer rl.closeWindow();
 
@@ -225,6 +237,15 @@ pub fn main() !void {
             else => {},
         }
     }
+
+    const file = std.fs.cwd().createFile("bismi_allah.ltt", std.fs.File.CreateFlags{ .read = true }) catch |e| {
+        try tlist.clear();
+        allocator.destroy(tlist);
+        return e;
+    };
+    try tlist.saveToStream(file);
+    file.close();
+
     try tlist.clear();
     allocator.destroy(tlist);
 }
