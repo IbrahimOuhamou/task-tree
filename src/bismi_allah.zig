@@ -30,6 +30,8 @@ pub fn main() !void {
     rl.initWindow(1200, 600, "بسم الله الرحمن الرحيم");
     defer rl.closeWindow();
 
+    var camera = rl.Camera2D{ .offset = rl.Vector2.init(0, 0), .target = rl.Vector2.init(0, 0), .rotation = 0, .zoom = 1 };
+
     rl.setTargetFPS(60);
     rl.setWindowState(rl.ConfigFlags.flag_window_resizable);
 
@@ -61,10 +63,26 @@ pub fn main() !void {
     var state_machine: StateMachine = StateMachine.Idle;
 
     while (!rl.windowShouldClose()) {
+        // TODO: by the will of Allah make it keyboard-only (kinda of)
+        const mouse_pos = rl.getScreenToWorld2D(rl.getMousePosition(), camera);
         const delta = rl.getMouseDelta();
 
+        if (rl.isKeyDown(.key_left_control) and rl.isKeyDown(.key_up)) {
+            camera.zoom += 0.01;
+        } else if (rl.isKeyDown(.key_left_control) and rl.isKeyDown(.key_down)) {
+            camera.zoom -= 0.01;
+        } else if (rl.isKeyDown(.key_up)) {
+            camera.target.y -= 4;
+        } else if (rl.isKeyDown(.key_down)) {
+            camera.target.y += 4;
+        } else if (rl.isKeyDown(.key_left)) {
+            camera.target.x -= 4;
+        } else if (rl.isKeyDown(.key_right)) {
+            camera.target.x += 4;
+        }
+
         // -------------------------------------------------------------------------------------------------------------------------------------
-        //                                                      handlr state
+        //                                                      handle state
         // -------------------------------------------------------------------------------------------------------------------------------------
         // state with the help of Allah
         // if a task is clicked it becomes TaskKSelect|TaskMove
@@ -114,19 +132,35 @@ pub fn main() !void {
                     if (rl.isMouseButtonDown(.mouse_button_left) and rl.checkCollisionPointRec(rl.getMousePosition(), .{ .x = task.?.x, .y = task.?.y, .width = TASK_WIDTH, .height = TASK_HEIGHT })) {
                         switch (state_machine) {
                             .TaskConnectChild => {
-                                tlist.taskAddChildId(tlist.data.?[selected_task].?.id, task.?.id, true) catch |e| if (tt.Tlist.Error.TaskCanNotBeGrandChildOfItSelf != e) return e;
+                                if (tlist.data.?[selected_task].?.hasChildId(task.?.id)) {
+                                    try tlist.taskRemoveChildId(tlist.data.?[selected_task].?.id, task.?.id, true);
+                                } else {
+                                    tlist.taskAddChildId(tlist.data.?[selected_task].?.id, task.?.id, true) catch |e| if (tt.Tlist.Error.TaskCanNotBeGrandChildOfItSelf != e) return e;
+                                }
                                 break :handle_state .TaskSelect;
                             },
                             .TaskConnectParent => {
-                                tlist.taskAddParentId(tlist.data.?[selected_task].?.id, task.?.id, true) catch |e| if (tt.Tlist.Error.TaskCanNotBeGrandChildOfItSelf != e) return e;
+                                if (tlist.data.?[selected_task].?.hasParentId(task.?.id)) {
+                                    try tlist.taskRemoveParentId(tlist.data.?[selected_task].?.id, task.?.id, true);
+                                } else {
+                                    tlist.taskAddParentId(tlist.data.?[selected_task].?.id, task.?.id, true) catch |e| if (tt.Tlist.Error.TaskCanNotBeGrandChildOfItSelf != e) return e;
+                                }
                                 break :handle_state .TaskSelect;
                             },
                             .TaskConnectNext => {
-                                tlist.taskAddNextId(tlist.data.?[selected_task].?.id, task.?.id) catch |e| if (tt.Tlist.Error.TaskCanNotBeNextOfItSelf != e) return e;
+                                if (tlist.data.?[selected_task].?.hasNextId(task.?.id)) {
+                                    try tlist.taskRemoveNextId(tlist.data.?[selected_task].?.id, task.?.id);
+                                } else {
+                                    tlist.taskAddNextId(tlist.data.?[selected_task].?.id, task.?.id) catch |e| if (tt.Tlist.Error.TaskCanNotBeNextOfItSelf != e) return e;
+                                }
                                 break :handle_state .TaskSelect;
                             },
                             .TaskConnectPrev => {
-                                tlist.taskAddPreviousId(tlist.data.?[selected_task].?.id, task.?.id) catch |e| if (tt.Tlist.Error.TaskCanNotBeNextOfItSelf != e) return e;
+                                if (tlist.data.?[selected_task].?.hasPreviousId(task.?.id)) {
+                                    try tlist.taskRemovePreviousId(tlist.data.?[selected_task].?.id, task.?.id);
+                                } else {
+                                    tlist.taskAddPreviousId(tlist.data.?[selected_task].?.id, task.?.id) catch |e| if (tt.Tlist.Error.TaskCanNotBeNextOfItSelf != e) return e;
+                                }
                                 break :handle_state .TaskSelect;
                             },
                             else => {
@@ -144,7 +178,6 @@ pub fn main() !void {
             if (.TlistMenu == state_machine and rl.isMouseButtonDown(.mouse_button_left) and rl.checkCollisionPointRec(rl.getMousePosition(), control_panel.rec)) break :handle_state .TlistMenu;
 
             if (rl.isMouseButtonDown(.mouse_button_right)) {
-                const mouse_pos = rl.getMousePosition();
                 control_panel.rec.x = mouse_pos.x;
                 control_panel.rec.y = mouse_pos.y;
                 break :handle_state .TlistMenu;
@@ -165,7 +198,10 @@ pub fn main() !void {
                     }
                 },
                 .TaskSelect => {
-                    if (!rl.isMouseButtonPressed(.mouse_button_left)) break :react_to_state;
+                    if (rl.isKeyPressed(.key_delete)) {
+                        try tlist.removeTaskById(selected_task, true);
+                    }
+                    break :react_to_state;
                 },
                 else => {},
             }
@@ -175,9 +211,13 @@ pub fn main() !void {
         defer rl.endDrawing();
         rl.clearBackground(rl.Color.gray);
 
+        camera.begin();
+        defer camera.end();
         // -------------------------------------------------------------------------------------------------------------------------------------
         //                                                      draw tasks
         // -------------------------------------------------------------------------------------------------------------------------------------
+
+        // rgui.SetMousePosition(@intFromFloat(mouse_pos.x), @intFromFloat(mouse_pos.y));
         if (null != tlist.data) {
             for (tlist.data.?) |task| {
                 if (null == task) continue;
@@ -243,7 +283,7 @@ pub fn main() !void {
         allocator.destroy(tlist);
         return e;
     };
-    try tlist.saveToStream(file);
+    tlist.saveToStream(file) catch |e| if (tt.Tlist.Error.DataIsNull != e) return e;
     file.close();
 
     try tlist.clear();
