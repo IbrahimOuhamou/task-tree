@@ -47,6 +47,7 @@ pub fn main() !void {
     control_panel.buffer[0] = 0;
     control_panel.buffer[control_panel.buffer.len - 1] = 0;
     var selected_task: ?*tt.Task = null;
+    // var selected_task2: ?*tt.Task = null;
 
     const StateMachine = enum {
         Idle,
@@ -68,129 +69,10 @@ pub fn main() !void {
 
     while (!rl.windowShouldClose()) {
         // TODO: by the will of Allah make it keyboard-only (kinda of)
-        // const mouse_pos = rl.getScreenToWorld2D(rl.getMousePosition(), camera);
-        // const delta = rl.getMouseDelta();
-
-        // if (rl.isKeyDown(.key_left_control) and rl.isKeyDown(.key_up)) {
-        //     camera.zoom += 0.01;
-        // } else if (rl.isKeyDown(.key_left_control) and rl.isKeyDown(.key_down)) {
-        //     camera.zoom -= 0.01;
-        // } else if (rl.isKeyDown(.key_up)) {
-        //     camera.target.y -= 4;
-        // } else if (rl.isKeyDown(.key_down)) {
-        //     camera.target.y += 4;
-        // } else if (rl.isKeyDown(.key_left)) {
-        //     camera.target.x -= 4;
-        // } else if (rl.isKeyDown(.key_right)) {
-        //     camera.target.x += 4;
-        // }
 
         // -------------------------------------------------------------------------------------------------------------------------------------
         //                                                      handle state
         // -------------------------------------------------------------------------------------------------------------------------------------
-        // state with the help of Allah
-        // if a task is clicked it becomes TaskKSelect|TaskMove
-        // state_machine = handle_state: {
-        //     // if there was no mouse no state was changed or stopped moving a task
-        //     if (!(rl.isMouseButtonDown(.mouse_button_left) or rl.isMouseButtonDown(.mouse_button_right))) {
-        //         if (.TaskMove == state_machine) break :handle_state .TaskSelect;
-        //         break :handle_state state_machine;
-        //     }
-        //
-        //     // stopped moving a task
-        //     if (.TaskMove == state_machine and !rl.isMouseButtonDown(.mouse_button_left)) break :handle_state .TaskSelect;
-        //
-        //     if (null != tlist.data) {
-        //         // incha'Allah will test the selected task first
-        //         {
-        //             const task = try tlist.getTask(selected_task);
-        //             if (StateMachine.TaskSelect == state_machine) {
-        //                 var vec = rl.Vector2{ .x = task.x, .y = task.y + (TASK_HEIGHT / 3) };
-        //                 if (rl.checkCollisionPointCircle(rl.getMousePosition(), vec, 15)) {
-        //                     break :handle_state .TaskConnectPrev;
-        //                 }
-        //                 vec.x += TASK_WIDTH;
-        //                 if (rl.checkCollisionPointCircle(rl.getMousePosition(), vec, 15)) {
-        //                     break :handle_state .TaskConnectNext;
-        //                 }
-        //                 vec.x -= TASK_WIDTH / 2;
-        //                 vec.y = task.y;
-        //                 if (rl.checkCollisionPointCircle(rl.getMousePosition(), vec, 15)) {
-        //                     break :handle_state .TaskConnectParent;
-        //                 }
-        //                 vec.y += TASK_HEIGHT;
-        //                 if (rl.checkCollisionPointCircle(rl.getMousePosition(), vec, 15)) {
-        //                     break :handle_state .TaskConnectChild;
-        //                 }
-        //             } else if (rl.checkCollisionPointRec(rl.getMousePosition(), .{ .x = task.x, .y = task.y, .width = TASK_WIDTH, .height = TASK_HEIGHT })) {
-        //                 if (rl.isMouseButtonDown(.mouse_button_left)) {
-        //                     selected_task = task.id;
-        //                     if (0 != delta.x or 0 != delta.y) break :handle_state .TaskMove;
-        //                     break :handle_state .TaskSelect;
-        //                 }
-        //             }
-        //         }
-        //
-        //         for (tlist.data.?) |task| {
-        //             if (null == task) continue;
-        //             if (rl.isMouseButtonDown(.mouse_button_left) and rl.checkCollisionPointRec(rl.getMousePosition(), .{ .x = task.?.x, .y = task.?.y, .width = TASK_WIDTH, .height = TASK_HEIGHT })) {
-        //                 switch (state_machine) {
-        //                     .TaskConnectChild => {
-        //                         if (selected_task.?.hasChildId(task.?.id)) {
-        //                             try tlist.taskRemoveChildId(selected_task.?.id, task.?.id, true);
-        //                         } else {
-        //                             tlist.taskAddChildId(selected_task.?.id, task.?.id, true) catch |e| if (tt.Tlist.Error.TaskCanNotBeGrandChildOfItSelf != e) return e;
-        //                         }
-        //                         break :handle_state .TaskSelect;
-        //                     },
-        //                     .TaskConnectParent => {
-        //                         if (selected_task.?.hasParentId(task.?.id)) {
-        //                             try tlist.taskRemoveParentId(selected_task.?.id, task.?.id, true);
-        //                         } else {
-        //                             tlist.taskAddParentId(selected_task.?.id, task.?.id, true) catch |e| if (tt.Tlist.Error.TaskCanNotBeGrandChildOfItSelf != e) return e;
-        //                         }
-        //                         break :handle_state .TaskSelect;
-        //                     },
-        //                     .TaskConnectNext => {
-        //                         if (selected_task.?.hasNextId(task.?.id)) {
-        //                             try tlist.taskRemoveNextId(selected_task.?.id, task.?.id);
-        //                         } else {
-        //                             tlist.taskAddNextId(selected_task.?.id, task.?.id) catch |e| if (tt.Tlist.Error.TaskCanNotBeNextOfItSelf != e) return e;
-        //                         }
-        //                         break :handle_state .TaskSelect;
-        //                     },
-        //                     .TaskConnectPrev => {
-        //                         if (selected_task.?.hasPreviousId(task.?.id)) {
-        //                             try tlist.taskRemovePreviousId(selected_task.?.id, task.?.id);
-        //                         } else {
-        //                             tlist.taskAddPreviousId(selected_task.?.id, task.?.id) catch |e| if (tt.Tlist.Error.TaskCanNotBeNextOfItSelf != e) return e;
-        //                         }
-        //                         break :handle_state .TaskSelect;
-        //                     },
-        //                     else => {
-        //                         selected_task = task.?.id;
-        //                         if (0 != delta.x or 0 != delta.y) break :handle_state .TaskMove;
-        //                         break :handle_state .TaskSelect;
-        //                     },
-        //                 }
-        //             }
-        //         }
-        //     }
-        //
-        //     // we ask the help of Allah
-        //
-        //     if (.TlistMenu == state_machine and rl.isMouseButtonDown(.mouse_button_left) and rl.checkCollisionPointRec(rl.getMousePosition(), control_panel.rec)) break :handle_state .TlistMenu;
-        //
-        //     if (rl.isMouseButtonDown(.mouse_button_right)) {
-        //         control_panel.rec.x = mouse_pos.x;
-        //         control_panel.rec.y = mouse_pos.y;
-        //         break :handle_state .TlistMenu;
-        //     }
-        //
-        //     // if no task was clicked
-        //     break :handle_state .Idle;
-        // };
-
         // keyboard state by the will of Allah
         // s: start selecting tasks
         //     m: start moving the task
@@ -269,18 +151,9 @@ pub fn main() !void {
                         break :handle_state .TaskSelect;
                     }
                     if (rl.isKeyPressed(.key_left)) {
-                        // var i: u32 = selected_task.?.id - 1;
-                        // get_previous_task: while (i > 0) : (i -= 0) {
-                        //     if (null == tlist.data.?[i]) continue :get_previous_task;
-                        //     selected_task = tlist.data.?[i];
-                        //     break :get_previous_task;
-                        // }
-                        // if (i == selected_task.?.id and null != tlist.data.?[0]) selected_task = tlist.data.?[0];
-                        // break :handle_state .TaskSelect;
                         get_previous_task: for (tlist.data.?[0..selected_task.?.id]) |task| {
                             if (null == task) continue :get_previous_task;
                             selected_task = task;
-
                             camera.target = rl.Vector2{ .x = selected_task.?.x - 600, .y = selected_task.?.y - 300 };
                         }
                         break :handle_state .TaskSelect;
@@ -300,6 +173,7 @@ pub fn main() !void {
                     if (rl.isKeyDown(.key_left)) camera.target.x -= 4;
                     if (rl.isKeyDown(.key_right)) camera.target.x += 4;
                 },
+                .TaskConnectParent => {},
                 else => {
                     if (rl.isKeyPressed(.key_escape)) break :handle_state .Idle;
                 },
