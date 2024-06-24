@@ -28,9 +28,10 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+
     const raylib = raylib_dep.module("raylib");
-    const raylib_gui = raylib_dep.module("raylib-gui");
-    exe.root_module.addImport("raylib-gui", raylib_gui);
+    const raygui = raylib_dep.module("raygui");
+    exe.root_module.addImport("raygui", raygui);
     exe.root_module.addImport("raylib", raylib);
     const raylib_artifact = raylib_dep.artifact("raylib"); // raylib C library
 

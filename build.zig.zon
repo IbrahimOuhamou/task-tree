@@ -8,12 +8,12 @@
 
     .dependencies = .{
         .@"libtask-tree" = .{
-            .url = "https://github.com/IbrahimOuhamou/libtask-tree/archive/2bc2e239f8066ce8d6c8a647dbc37d678c8bd004.tar.gz",
-            .hash = "12204ce559eea1c54095baa1e2150065e8dd43c3aaab09d22cfaca8ff308f6135512",
+            .url = "https://github.com/IbrahimOuhamou/libtask-tree/archive/4ce25ce8a91d71c93a35510e095cc9a2cdd2d875.tar.gz",
+            .hash = "1220e9f8264877c38f26e693a42970249035caae09111a20ffa6ba1b267844c892d7",
         },
         .@"raylib-zig" = .{
-            .url = "https://github.com/IbrahimOuhamou/raylib-zig/archive/b94d42f27f380517eb337474bcc4e3cc6b125934.tar.gz",
-            .hash = "122002056dc85b107e18b4224d8436fc9b5b4b01e93e269db54041bdf47554aa93ef",
+            .url = "https://github.com/Not-Nik/raylib-zig/archive/18a7daa631913447d06737f0faf3c9954ecac387.tar.gz",
+            .hash = "1220f7489d0946ca7ea7ffec154041cb862066491f789c2a5f823191ed325d4c37ef",
         },
     },
 

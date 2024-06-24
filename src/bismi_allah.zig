@@ -3,10 +3,12 @@
 const std = @import("std");
 const tt = @import("libtask-tree");
 const rl = @import("raylib");
-const rgui = @import("raylib-gui");
+const rgui = @import("raygui");
 
 const TASK_WIDTH = 100;
 const TASK_HEIGHT = 120;
+
+const font_size = 2;
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -34,7 +36,8 @@ pub fn main() !void {
     var camera = rl.Camera2D{ .offset = rl.Vector2.init(0, 0), .target = rl.Vector2.init(0, 0), .rotation = 0, .zoom = 1 };
 
     rl.setTargetFPS(60);
-    rl.setWindowState(rl.ConfigFlags.flag_window_resizable);
+    // rl.setWindowState(rl.ConfigFlags.flag_window_resizable);
+    rl.setWindowState(.{ .window_resizable = true });
 
     const ControlPanel = struct {
         buffer: [34:0]u8 = [34:0]u8{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -196,7 +199,8 @@ pub fn main() !void {
             for (tlist.data.?) |task| {
                 if (null == task) continue;
                 rl.drawRectangleRec(.{ .x = task.?.x, .y = task.?.y, .width = TASK_WIDTH, .height = TASK_HEIGHT }, rl.Color.lime);
-                rgui.GuiDrawText(&task.?.name, .{ .x = task.?.x, .y = task.?.y + 2, .width = 100, .height = 20 }, 0, .{ .r = 0, .g = 0, .b = 0, .a = 255 });
+                //rgui.GuiDrawText(&task.?.name, .{ .x = task.?.x, .y = task.?.y + 2, .width = 100, .height = 20 }, 0, .{ .r = 0, .g = 0, .b = 0, .a = 255 });
+                rl.drawText(&task.?.name, @intFromFloat(task.?.x), @intFromFloat(task.?.y), font_size, rl.Color.black);
 
                 if (null != task.?.children_ids) {
                     for (task.?.children_ids.?) |child_id| {
@@ -216,7 +220,8 @@ pub fn main() !void {
             switch (state_machine) {
                 .TlistMenu => {
                     rl.drawRectangleRec(control_panel.rec, rl.Color.brown);
-                    _ = rgui.GuiTextBox(.{ .x = control_panel.rec.x + 1, .y = control_panel.rec.y + 5, .width = control_panel.rec.width - 2, .height = 15 }, &control_panel.buffer, 34, true);
+                    // _ = rgui.GuiTextBox(.{ .x = control_panel.rec.x + 1, .y = control_panel.rec.y + 5, .width = control_panel.rec.width - 2, .height = 15 }, &control_panel.buffer, 34, true);
+                    _ = rgui.guiTextBox(.{ .x = control_panel.rec.x + 1, .y = control_panel.rec.y + 5, .width = control_panel.rec.width - 2, .height = font_size }, &control_panel.buffer, font_size, true);
                 },
                 .TaskSelect, .TaskMove => {
                     if (null == selected_task) break :draw_to_state;
@@ -250,9 +255,10 @@ pub fn main() !void {
             }
         }
         {
-            var state_name: [64]u8 = undefined;
+            var state_name: [64:0]u8 = undefined;
             _ = try std.fmt.bufPrint(&state_name, "{any}", .{state_machine});
-            rgui.GuiDrawText(&state_name, .{ .x = camera.target.x + camera.offset.x, .y = camera.target.y + camera.offset.y, .width = 500, .height = 50 }, 0, .{ .r = 0, .g = 0, .b = 0, .a = 255 });
+            // rgui.GuiDrawText(&state_name, .{ .x = camera.target.x + camera.offset.x, .y = camera.target.y + camera.offset.y, .width = 500, .height = 50 }, 0, .{ .r = 0, .g = 0, .b = 0, .a = 255 });
+            rl.drawText(&state_name, @intFromFloat(camera.target.x), @intFromFloat(camera.target.y), font_size, rl.Color.black);
             // std.debug.print("alhamdo li Allah: {any}\n", .{state_machine});
         }
     }
