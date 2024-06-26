@@ -8,7 +8,7 @@ const rgui = @import("raygui");
 const TASK_WIDTH = 100;
 const TASK_HEIGHT = 120;
 
-const font_size = 2;
+const font_size = 10;
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -40,7 +40,7 @@ pub fn main() !void {
     rl.setWindowState(.{ .window_resizable = true });
 
     const ControlPanel = struct {
-        buffer: [34:0]u8 = [34:0]u8{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        buffer: [34:0]u8 = [1:0]u8{0} ** 34,
         rec: rl.Rectangle,
     };
 
@@ -77,23 +77,23 @@ pub fn main() !void {
         //                                                      handle state
         // -------------------------------------------------------------------------------------------------------------------------------------
         // keyboard state by the will of Allah
-        // s: start selecting tasks
+        // s: start selecting tasks .TaskSelect
         //     m: start moving the task
         //         key_left: move to left
         //         key_right: move to right
         //         key_up: move to up
         //         key_down: move to down
         //         Esc: cancel to .TaskSelect
-        //     d: delete the task
+        //     d: delete the task and select next not null task
         //     r: rename the task
         //     key_right: next non null id
         //     key_left: previous non null id
         //     Esc: cancel
         // m: menu
+        //     n: add new task
+        //         enter: ok
+        //         Esc: cancel
         //     s: save
-        //     Esc: cancel
-        // n: add new task
-        //     enter: ok
         //     Esc: cancel
         state_machine = handle_state: {
             switch (state_machine) {
@@ -220,7 +220,6 @@ pub fn main() !void {
             switch (state_machine) {
                 .TlistMenu => {
                     rl.drawRectangleRec(control_panel.rec, rl.Color.brown);
-                    // _ = rgui.GuiTextBox(.{ .x = control_panel.rec.x + 1, .y = control_panel.rec.y + 5, .width = control_panel.rec.width - 2, .height = 15 }, &control_panel.buffer, 34, true);
                     _ = rgui.guiTextBox(.{ .x = control_panel.rec.x + 1, .y = control_panel.rec.y + 5, .width = control_panel.rec.width - 2, .height = font_size }, &control_panel.buffer, font_size, true);
                 },
                 .TaskSelect, .TaskMove => {
@@ -257,8 +256,8 @@ pub fn main() !void {
         {
             var state_name: [64:0]u8 = undefined;
             _ = try std.fmt.bufPrint(&state_name, "{any}", .{state_machine});
-            // rgui.GuiDrawText(&state_name, .{ .x = camera.target.x + camera.offset.x, .y = camera.target.y + camera.offset.y, .width = 500, .height = 50 }, 0, .{ .r = 0, .g = 0, .b = 0, .a = 255 });
-            rl.drawText(&state_name, @intFromFloat(camera.target.x), @intFromFloat(camera.target.y), font_size, rl.Color.black);
+            rl.drawRectangle(@intFromFloat(camera.target.x), @intFromFloat(camera.target.y), font_size * (state_name.len - 30), font_size * 2, rl.Color.dark_blue);
+            rl.drawText(state_name[30..], @intFromFloat(camera.target.x), @intFromFloat(camera.target.y), font_size * 2, rl.Color.black);
             // std.debug.print("alhamdo li Allah: {any}\n", .{state_machine});
         }
     }
