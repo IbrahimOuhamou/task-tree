@@ -107,6 +107,7 @@ pub fn main() !void {
                         break :handle_state .TlistMenu;
                     }
                 },
+
                 .TlistMenu => {
                     if (rl.isKeyPressed(.key_escape)) break :handle_state .Idle;
                     if (0 != control_panel.buffer[0] and rl.isKeyPressed(.key_enter)) {
@@ -119,6 +120,7 @@ pub fn main() !void {
                         break :handle_state .Idle;
                     }
                 },
+
                 .TaskSelect => {
                     if (rl.isKeyPressed(.key_escape)) break :handle_state .Idle;
                     if (null == tlist.data) break :handle_state .Idle;
@@ -162,6 +164,7 @@ pub fn main() !void {
                         break :handle_state .TaskSelect;
                     }
                 },
+
                 .TaskMove => {
                     if (rl.isKeyDown(.key_escape)) break :handle_state .Idle;
                     if (rl.isKeyDown(.key_up)) selected_task.?.y -= 4;
@@ -169,6 +172,7 @@ pub fn main() !void {
                     if (rl.isKeyDown(.key_left)) selected_task.?.x -= 4;
                     if (rl.isKeyDown(.key_right)) selected_task.?.x += 4;
                 },
+
                 .ViewMove => {
                     if (rl.isKeyDown(.key_escape)) break :handle_state .Idle;
                     if (rl.isKeyDown(.key_up)) camera.target.y -= 4;
@@ -176,7 +180,9 @@ pub fn main() !void {
                     if (rl.isKeyDown(.key_left)) camera.target.x -= 4;
                     if (rl.isKeyDown(.key_right)) camera.target.x += 4;
                 },
+
                 .TaskConnectParent => {},
+
                 else => {
                     if (rl.isKeyPressed(.key_escape)) break :handle_state .Idle;
                 },
