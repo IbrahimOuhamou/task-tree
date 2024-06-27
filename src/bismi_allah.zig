@@ -50,7 +50,7 @@ pub fn main() !void {
     control_panel.buffer[0] = 0;
     control_panel.buffer[control_panel.buffer.len - 1] = 0;
     var selected_task: ?*tt.Task = null;
-    // var selected_task2: ?*tt.Task = null;
+    const selected_task2: ?*tt.Task = null;
 
     const StateMachine = enum {
         Idle,
@@ -181,7 +181,9 @@ pub fn main() !void {
                     if (rl.isKeyDown(.key_right)) camera.target.x += 4;
                 },
 
-                .TaskConnectParent => {},
+                .TaskConnectParent => {
+                    if (rl.isKeyPressed(.key_escape)) break :handle_state .Idle;
+                },
 
                 else => {
                     if (rl.isKeyPressed(.key_escape)) break :handle_state .Idle;
@@ -241,20 +243,20 @@ pub fn main() !void {
                     rl.drawCircleV(vec, 15, rl.Color.blue);
                 },
                 .TaskConnectChild => {
-                    if (null == selected_task) break :draw_to_state;
-                    rl.drawLineBezier(rl.Vector2{ .x = selected_task.?.x + (TASK_WIDTH / 2), .y = selected_task.?.y + TASK_HEIGHT }, rl.getMousePosition(), 7, rl.Color.orange);
+                    if (null == selected_task or null == selected_task2) break :draw_to_state;
+                    rl.drawLineBezier(rl.Vector2{ .x = selected_task.?.x + (TASK_WIDTH / 2), .y = selected_task.?.y + TASK_HEIGHT }, rl.Vector2{ .x = selected_task2.x + (TASK_WIDTH / 2), .y = selected_task2.y }, 7, rl.Color.orange);
                 },
                 .TaskConnectParent => {
-                    if (null == selected_task) break :draw_to_state;
-                    rl.drawLineBezier(rl.Vector2{ .x = selected_task.?.x + (TASK_WIDTH / 2), .y = selected_task.?.y }, rl.getMousePosition(), 7, rl.Color.orange);
+                    if (null == selected_task or null == selected_task2) break :draw_to_state;
+                    rl.drawLineBezier(rl.Vector2{ .x = selected_task.?.x + (TASK_WIDTH / 2), .y = selected_task.?.y }, rl.Vector2{ .x = selected_task2.x + (TASK_WIDTH / 2), .y = selected_task2.y + TASK_HEIGHT }, 7, rl.Color.orange);
                 },
                 .TaskConnectNext => {
-                    if (null == selected_task) break :draw_to_state;
-                    rl.drawLineBezier(rl.Vector2{ .x = selected_task.?.x + TASK_WIDTH, .y = selected_task.?.y + (TASK_HEIGHT / 3) }, rl.getMousePosition(), 7, rl.Color.beige);
+                    if (null == selected_task or null == selected_task2) break :draw_to_state;
+                    rl.drawLineBezier(rl.Vector2{ .x = selected_task.?.x + TASK_WIDTH, .y = selected_task.?.y + (TASK_HEIGHT / 3) }, rl.Vector2{ .x = selected_task2.x, .y = selected_task2.y + (TASK_HEIGHT / 3) }, 7, rl.Color.beige);
                 },
                 .TaskConnectPrev => {
-                    if (null == selected_task) break :draw_to_state;
-                    rl.drawLineBezier(rl.Vector2{ .x = selected_task.?.x, .y = selected_task.?.y + (TASK_HEIGHT / 3) }, rl.getMousePosition(), 7, rl.Color.beige);
+                    if (null == selected_task or null == selected_task2) break :draw_to_state;
+                    rl.drawLineBezier(rl.Vector2{ .x = selected_task.?.x, .y = selected_task.?.y + (TASK_HEIGHT / 3) }, rl.Vector2{ .x = selected_task2.x + TASK_WIDTH, .y = selected_task2.y + (TASK_HEIGHT / 3) }, 7, rl.Color.beige);
                 },
                 else => {},
             }
@@ -262,7 +264,10 @@ pub fn main() !void {
         {
             var state_name: [64:0]u8 = undefined;
             _ = try std.fmt.bufPrint(&state_name, "{any}", .{state_machine});
-            rl.drawRectangle(@intFromFloat(camera.target.x), @intFromFloat(camera.target.y), font_size * (state_name.len - 30), font_size * 2, rl.Color.dark_blue);
+            {
+                const pos_zero = rl.getScreenToWorld2D(.{ .x = 0, .y = 0 }, camera);
+                rl.drawRectangle(@intFromFloat(pos_zero.x), @intFromFloat(pos_zero.y), font_size * (state_name.len - 30), font_size * 2, rl.Color.dark_blue);
+            }
             rl.drawText(state_name[30..], @intFromFloat(camera.target.x), @intFromFloat(camera.target.y), font_size * 2, rl.Color.black);
             // std.debug.print("alhamdo li Allah: {any}\n", .{state_machine});
         }
