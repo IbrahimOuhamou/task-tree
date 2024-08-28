@@ -228,7 +228,7 @@ pub fn main() !void {
             switch (state_machine) {
                 .TlistMenu => {
                     rl.drawRectangleRec(control_panel.rec, rl.Color.brown);
-                    _ = rgui.guiTextBox(.{ .x = control_panel.rec.x + 1, .y = control_panel.rec.y + 5, .width = control_panel.rec.width - 2, .height = font_size }, &control_panel.buffer, font_size, true);
+                    _ = rgui.guiTextBox(.{ .x = control_panel.rec.x + 1, .y = control_panel.rec.y + 5, .width = control_panel.rec.width - 2, .height = font_size }, &control_panel.buffer, control_panel.buffer.len, true);
                 },
                 .TaskSelect, .TaskMove => {
                     if (null == selected_task) break :draw_to_state;
